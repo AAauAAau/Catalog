@@ -1,0 +1,16 @@
+{% extends "layout.html" %} {% block content %} {% for categorieitem in categorieitems %}
+<article class="media content-section">
+
+    {% if categorieitem.picture is not none %}
+    <img class="rounded-circle article-img" src="{{ url_for(categorieitem.picture) }}"> {% else %}
+    <img class="rounded-circle article-img" src="https://cdn.pixabay.com/photo/2014/10/14/20/24/the-ball-488700_960_720.jpg"> {%endif %}
+    <div class="media-body">
+        <div class="article-metadata">
+            <a class="mr-2" href="#">{{  categorieitem.categorie.name }}</a>
+            <small class="text-muted">{{ categorieitem.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</small>
+        </div>
+        <h2><a class="article-title" href="#">{{ categorieitem.name }}</a></h2>
+        <p class="article-content">{{ categorieitem.description }}</p>
+    </div>
+</article>
+{% endfor %} {% endblock content %}

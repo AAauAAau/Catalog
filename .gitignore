@@ -102,3 +102,12 @@ venv.bak/
 
 # mypy
 .mypy_cache/
+
+#vscode
+.vscode
+
+#my
+notes.txt
+requirements.txt
+/Catalog/database
+/Catalog/static/profile_pics
