@@ -1,0 +1,14 @@
+#authlib==0.11
+flask
+flask_sqlalchemy
+wtforms
+flask_wtf
+passlib[bcrypt]
+flask-httpauth
+itsdangerous
+requests
+oauth2client.client
+httplib2
+#google-api-python-client
+#google-auth
+#virtualenv

@@ -108,6 +108,5 @@ venv.bak/
 
 #my
 notes.txt
-requirements.txt
 /Catalog/database
 /Catalog/static/profile_pics

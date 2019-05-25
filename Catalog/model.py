@@ -1,6 +1,10 @@
 from Catalog import db
 import datetime
+from passlib.apps import custom_app_context as pwd_context
+from itsdangerous import(TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired)
+import random, string
 
+secret_key = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(32))
 class Categorie(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
@@ -28,11 +32,37 @@ class CategorieItem(db.Model):
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(100), unique=True, nullable=False)
+    email = db.Column(db.String(100), unique=True, nullable=True)
     name = db.Column(db.String(100), nullable=True)
+    password_hash = db.Column(db.String(64))
     picture = db.Column(db.String(200))
     active = db.Column(db.Boolean, default=False)
-    tokens = db.Column(db.Text)
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow())
+
+    def hash_password(self, password):
+        self.password_hash = pwd_context.hash(password)
+
+    def verify_password(self, password):
+        return pwd_context.verify(password, self.password_hash)
+
+    def generate_auth_token(self, expiration=600):
+        s = Serializer(secret_key, expires_in = expiration)
+        return s.dumps({'id': self.id })
+            
+    @staticmethod
+    def verify_auth_token(token):
+    	s = Serializer(secret_key)
+    	try:
+    		data = s.loads(token)
+    	except SignatureExpired:
+    		#Valid Token, but expired
+    		return None
+    	except BadSignature:
+    		#Invalid Token
+    		return None
+    	user_id = data['id']
+    	return user_id
+
     def __repr__(self):
         return f"User('{self.name}', '{self.email}', '{self.id}')"
+        
