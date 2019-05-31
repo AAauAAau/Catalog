@@ -24,6 +24,12 @@ def myItems():
     categorieitems = CategorieItem.query.filter_by(user_id=current_user.id).order_by(CategorieItem.created_at.desc()).all()
     return render_template('home.html', title='My Items', categories=categories, categorieitems=categorieitems)
 
+@app.route("/showCategorie/<int:categorie_id>/")
+@login_required
+def showCategorie(categorie_id):
+    categorieitems = CategorieItem.query.filter_by(categorie_id=categorie_id).order_by(CategorieItem.created_at.desc()).all()
+    return render_template('home.html', title='My Items', categories=categories, categorieitems=categorieitems)
+
 @app.route("/item/<int:item_id>/delete", methods=['POST'])
 @login_required
 def delete_item(item_id):
@@ -54,7 +60,7 @@ def login():
 def newItem():
     form = ItemForm()
     if form.validate_on_submit():
-        item = CategorieItem(name=form.name.data, description=form.description.data, author=current_user, price=str(form.price.data), categorie=Categorie.query.get_or_404(form.categorie.data))
+        item = CategorieItem(name=form.name.data, description=form.description.data, author=current_user, price=str(form.price.data[0]), categorie=Categorie.query.get_or_404(form.categorie.data))
         db.session.add(item)
         db.session.commit()
         flash('Your Item has been created!', 'success')

@@ -50,6 +50,10 @@ a.article-title:hover {
     white-space: pre-line;
 }
 
+.article-price {
+    color: #1B98E0
+}
+
 .article-img {
     height: 65px;
     width: 65px;
@@ -91,4 +95,10 @@ a.article-title:hover {
 
 .form-signin {
     width: 100%;
+}
+
+.profile-img {
+    height: 25px;
+    width: 25px;
+    margin-right: 6px;
 }

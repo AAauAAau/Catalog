@@ -20,19 +20,19 @@ CategorieItem2 = CategorieItem(
     user_id=user1.id,
     name="Soccer shoes",
     description="Juicy grilled veggie patty with tomato mayo and lettuce",
-    price="$7.50",
+    price="7.50",
     categorie_id=Categorie1.id)
 db.session.add(CategorieItem2)
 db.session.commit()
 
 CategorieItem2 = CategorieItem(user_id=user1.id, name="Ball", description="with garlic and parmesan",
-                               price="$2.99", categorie_id=Categorie1.id)
+                               price="2.99", categorie_id=Categorie1.id)
 
 db.session.add(CategorieItem2)
 db.session.commit()
 
 CategorieItem2 = CategorieItem(user_id=user1.id, name="shirt", description="Juicy grilled chicken patty with tomato mayo and lettuce",
-                               price="$5.50", categorie_id=Categorie1.id)
+                               price="5.50", categorie_id=Categorie1.id)
 
 db.session.add(CategorieItem2)
 db.session.commit()
@@ -44,13 +44,13 @@ db.session.add(Categorie2)
 db.session.commit()
 
 CategorieItem1 = CategorieItem(user_id=user1.id, name="Ball", description="With your choice of noodles vegetables and sauces",
-                               price="$7.99", categorie_id=Categorie2.id)
+                               price="7.99", categorie_id=Categorie2.id)
 
 db.session.add(CategorieItem1)
 db.session.commit()
 
 CategorieItem2 = CategorieItem(user_id=user1.id,
-                               name="Bullsshirt", description=" A famous duck dish from Beijing[1] that has been prepared since the imperial era. The meat is prized for its thin, crisp skin, with authentic versions of the dish serving mostly the skin and little meat, sliced in front of the diners by the cook", price="$25", categorie_id=Categorie2.id)
+                               name="Bullsshirt", description=" A famous duck dish from Beijing[1] that has been prepared since the imperial era. The meat is prized for its thin, crisp skin, with authentic versions of the dish serving mostly the skin and little meat, sliced in front of the diners by the cook", price="25", categorie_id=Categorie2.id)
 
 db.session.add(CategorieItem2)
 db.session.commit()
