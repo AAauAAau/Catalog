@@ -7,15 +7,16 @@
     <div class="media-body">
         <div class="article-metadata">
             <a class="mr-2" href="#">{{  categorieitem.categorie.name }}</a>
-            <small class="text-muted">{{ categorieitem.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</small> {% if categorieitem.author == current_user %}
-            <div>
-                <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{{ url_for('update_item', item_id=categorieitem.id) }}">Update</a>
-                <button type="button" class="btn btn-danger btn-sm m-1" data-toggle="modal" data-target="#deleteModal">Delete</button>
-            </div>
-            {% endif %}
+            <small class="text-muted">{{ categorieitem.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</small>
         </div>
         <h2><a class="article-title" href="#">{{ categorieitem.name }}</a></h2>
         <p class="article-content">{{ categorieitem.description }}</p>
+        {% if categorieitem.author == current_user %}
+        <div>
+            <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{{ url_for('update_item', item_id=categorieitem.id) }}">Update</a>
+            <button type="button" class="btn btn-danger btn-sm m-1" data-toggle="modal" data-target="#deleteModal">Delete</button>
+        </div>
+        {% endif %}
     </div>
 </article>
 <!-- Modal -->
