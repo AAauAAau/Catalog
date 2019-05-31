@@ -8,7 +8,10 @@ flask-httpauth
 itsdangerous
 requests
 oauth2client.client
+
+google-api-python-client
 httplib2
+flask-login
 #google-api-python-client
 #google-auth
 #virtualenv

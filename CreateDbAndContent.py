@@ -1,5 +1,5 @@
 from Catalog import db
-from Catalog.model import Categorie, CategorieItem, User
+from Catalog.models import Categorie, CategorieItem, User
 
 db.reflect()
 db.drop_all()

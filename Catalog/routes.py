@@ -1,180 +1,139 @@
 from flask import render_template, url_for, flash, redirect, request, jsonify, abort, g, make_response
 from Catalog import app, db
-from Catalog.model import User, CategorieItem, Categorie
-from Catalog.forms import RegistrationForm, LoginForm
-from flask_httpauth import HTTPBasicAuth
-from oauth2client.client import flow_from_clientsecrets, FlowExchangeError
+from Catalog.models import User, CategorieItem, Categorie
+from Catalog.forms import ItemForm
+from google.oauth2 import id_token
+from google.auth.transport import requests as googleRequests
+from flask_login import login_user, current_user, logout_user, login_required
 import httplib2
 import requests
 import json
 
-auth = HTTPBasicAuth()
-
-#CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())['web']['client_id']
-
-@auth.verify_password
-def verify_password(username_or_token, password):
-    #Try to see if it's a token first
-    user_id = User.verify_auth_token(username_or_token)
-    if user_id:
-        user = User.query.filter_by(id = user_id).one()
-    else:
-        user = User.query.filter_by(name = username_or_token).first()
-        if not user or not user.verify_password(password):
-            return False
-    g.user = user
-    return True
-
-@app.route('/clientOAuth')
-def start():
-    return render_template('clientOAuth.html')
+CLIENT_ID = json.loads(open('Catalog/client_secrets.json', 'r').read())['web']['client_id']
+categories = Categorie.query.order_by(Categorie.name).all()
 
 @app.route("/")
 @app.route("/home")
 def home():
-    categories = Categorie.query.order_by(Categorie.name).all()
-    categorieitems = CategorieItem.query.order_by(CategorieItem.created_at).all()
-    return render_template('home.html',title='Latest Post', categories=categories, categorieitems=categorieitems)
+    categorieitems = CategorieItem.query.order_by(CategorieItem.created_at.desc()).all()
+    return render_template('home.html', title='Latest Post', categories=categories, categorieitems=categorieitems)
 
+@app.route("/myItems")
+@login_required
+def myItems():
+    categorieitems = CategorieItem.query.filter_by(user_id=current_user.id).order_by(CategorieItem.created_at.desc()).all()
+    return render_template('home.html', title='My Items', categories=categories, categorieitems=categorieitems)
 
-@app.route("/categorieitem", methods=['GET', 'POST'])
-def about():
-    return render_template('home.html', title='About')
+@app.route("/item/<int:item_id>/delete", methods=['POST'])
+@login_required
+def delete_item(item_id):
+    item = CategorieItem.query.get_or_404(item_id)
+    if item.author != current_user:
+        abort(403)
+    db.session.delete(item)
+    db.session.commit()
+    flash('Your iIem has been deleted!', 'success')
+    return redirect(url_for('home'))
 
 @app.route('/api/resource')
-@auth.login_required
+@login_required
 def get_resource():
     return jsonify({ 'data': 'Hello, %s!' % g.user.name })
 
-@app.route('/token')
-@auth.login_required
-def get_auth_token():
-    token = g.user.generate_auth_token()
-    return jsonify({'token': token.decode('ascii')})
+@app.route("/logout")
+def logout():
+    logout_user()
+    return redirect(url_for('home'))
 
-@app.route("/register", methods=['GET', 'POST'])
-def register():
-    form = RegistrationForm()
+@app.route("/login")
+def login():
+    return render_template('login.html')
+
+@app.route("/item/new", methods=['GET', 'POST'])
+@login_required
+def newItem():
+    form = ItemForm()
     if form.validate_on_submit():
-        flash(f'Account created for {form.username.data}!', 'success')
+        item = CategorieItem(name=form.name.data, description=form.description.data, author=current_user, price=str(form.price.data), categorie=Categorie.query.get_or_404(form.categorie.data))
+        db.session.add(item)
+        db.session.commit()
+        flash('Your Item has been created!', 'success')
         return redirect(url_for('home'))
-    return render_template('register.html', title='Register', form=form)
+    return render_template('new_item.html', title='New Item',
+                           form=form, legend='New Item')
+@app.route("/item/<int:item_id>")
+@login_required
+def item(item_id):
+    item = CategorieItem.query.get_or_404(item_id)
+    return render_template('item.html', title=item.name, item=item)
 
 
-# @app.route("/login", methods=['GET', 'POST'])
-# def login():
-#     form = LoginForm()
-#     if form.validate_on_submit():
-#         if form.email.data == 'admin@blog.com' and form.password.data == 'password':
-#             flash('You have been logged in!', 'success')
-#             return redirect(url_for('home'))
-#         else:
-#             flash('Login Unsuccessful. Please check username and password', 'danger')
-#     return render_template('login.html', title='Login', form=form)
-
-@app.route('/api/users', methods = ['POST'])
-def new_user():
-    username = request.json.get('username')
-    password = request.json.get('password')
-    if username is None or password is None:
-        abort(400) # missing arguments
-    if User.query.filter_by(name = username).first() is not None:
-        abort(400) # existing user
-    user = User(name = username)
-    user.hash_password(password)
-    db.session.add(user)
-    db.session.commit()
-    return jsonify({ 'username': user.name}), 201, {'Location': url_for('get_user', id = user.id, _external = True)}
-
+@app.route("/item/<int:item_id>/update", methods=['GET', 'POST'])
+@login_required
+def update_item(item_id):
+    item = CategorieItem.query.get_or_404(item_id)
+    if item.author != current_user:
+        abort(403)
+    form = ItemForm()
+    if form.validate_on_submit():
+        item.name = form.name.data
+        item.description = form.description.data
+        db.session.commit()
+        flash('Your Item has been updated!', 'success')
+        return redirect(url_for('item', item_id=item.id))
+    elif request.method == 'GET':
+        form.name.data = item.name
+        form.description.data = item.description
+    return render_template('new_item.html', title='Update Item',
+                           form=form, legend='Update Item')
 @app.route('/api/users/<int:id>')
+@login_required
 def get_user(id):
     user = User.query.filter_by(id=id).one()
     if not user:
         abort(400)
     return jsonify({'username': user.name})
 
-
-@app.route('/oauth/<provider>', methods = ['POST'])
-def login(provider):
-    #STEP 1 - Parse the auth code
-    auth_code = request.json.get('auth_code')
-    print ("Step 1 - Complete, received auth code %s" % auth_code)
+@app.route('/signin/<provider>', methods = ['POST'])
+def signin(provider):
     if provider == 'google':
-        #STEP 2 - Exchange for a token
+        # (Receive token by HTTPS POST)
+        token =request.form.get('idtoken')
         try:
-            # Upgrade the authorization code into a credentials object
-            oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
-            oauth_flow.redirect_uri = 'postmessage'
-            credentials = oauth_flow.step2_exchange(auth_code)
-        except FlowExchangeError:
-            response = make_response(json.dumps('Failed to upgrade the authorization code.'), 401)
-            response.headers['Content-Type'] = 'application/json'
-            return response
-          
-        # Check that the access token is valid.
-        access_token = credentials.access_token
-        url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s' % access_token)
-        h = httplib2.Http()
-        result = json.loads(h.request(url, 'GET')[1])
-        # If there was an error in the access token info, abort.
-        if result.get('error') is not None:
-            response = make_response(json.dumps(result.get('error')), 500)
-            response.headers['Content-Type'] = 'application/json'
-            
-        # # Verify that the access token is used for the intended user.
-        # gplus_id = credentials.id_token['sub']
-        # if result['user_id'] != gplus_id:
-        #     response = make_response(json.dumps("Token's user ID doesn't match given user ID."), 401)
-        #     response.headers['Content-Type'] = 'application/json'
-        #     return response
+            # Specify the CLIENT_ID of the app that accesses the backend:
+            idinfo = id_token.verify_oauth2_token(token, googleRequests.Request(), CLIENT_ID)
 
-        # # Verify that the access token is valid for this app.
-        # if result['issued_to'] != CLIENT_ID:
-        #     response = make_response(json.dumps("Token's client ID does not match app's."), 401)
-        #     response.headers['Content-Type'] = 'application/json'
-        #     return response
-
-        # stored_credentials = login_session.get('credentials')
-        # stored_gplus_id = login_session.get('gplus_id')
-        # if stored_credentials is not None and gplus_id == stored_gplus_id:
-        #     response = make_response(json.dumps('Current user is already connected.'), 200)
-        #     response.headers['Content-Type'] = 'application/json'
-        #     return response
-        print ("Step 2 Complete! Access Token : %s " % credentials.access_token)
-
-        #STEP 3 - Find User or make a new one
+            # Or, if multiple clients access the backend server:
+            # idinfo = id_token.verify_oauth2_token(token, requests.Request())
+            # if idinfo['aud'] not in [CLIENT_ID_1, CLIENT_ID_2, CLIENT_ID_3]:
+            #     raise ValueError('Could not verify audience.')
         
-        #Get user info
-        h = httplib2.Http()
-        userinfo_url =  "https://www.googleapis.com/oauth2/v1/userinfo"
-        params = {'access_token': credentials.access_token, 'alt':'json'}
-        answer = requests.get(userinfo_url, params=params)
-      
-        data = answer.json()
+            if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
+                raise ValueError('Wrong issuer.')
 
-        name = data['name']
-        picture = data['picture']
-        email = data['email']
-        
-        
-     
-        #see if user exists, if it doesn't make a new one
-        user = User.query.filter_by(email=email).first()
-        if not user:
-            user = User(name = name, picture = picture, email = email)
-            session.add(user)
-            session.commit()
+            # If auth request is from a G Suite domain:
+            # if idinfo['hd'] != GSUITE_DOMAIN_NAME:
+            #     raise ValueError('Wrong hosted domain.')
 
-        
+            # ID token is valid. Get the user's Google Account ID from the decoded token.
+            userid = idinfo['sub']
+            email = idinfo['email']
+            picture = idinfo['picture']
+            name = idinfo['name']
+                  #see if user exists, if it doesn't make a new one
+            user = User.query.filter_by(email=email).first()
+            if not user:
+                user = User(name = name, picture = picture, email = email)
+                db.session.add(user)
+                db.session.commit()
+                flash('Your account has been created! You are now able to log in', 'success')    
 
-        #STEP 4 - Make token
-        token = user.generate_auth_token(600)
+            login_user(user, True)
+            next_page = request.args.get('next')
+           # flash('Login Successfull. Please check email and password', 'info')  
+            # return redirect(next_page) if next_page else redirect(url_for('home'))    
+            return name
+        except ValueError:
+            # Invalid token
+            pass
 
-        
-
-        #STEP 5 - Send back token to the client 
-        return jsonify({'token': token.decode('ascii')})
-        
-        #return jsonify({'token': token.decode('ascii'), 'duration': 600})
-    else:
-        return 'Unrecoginized Provider'

@@ -1,22 +1,26 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
-from wtforms.validators import DataRequired, Length, Email, EqualTo
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, SelectField, DecimalField
+from wtforms.validators import DataRequired, Length, Email, EqualTo, Required
+from Catalog.models import Categorie
 
+MyCategories = Categorie.query.order_by(Categorie.name).all()
 
-class RegistrationForm(FlaskForm):
-    username = StringField('Username',
-                           validators=[DataRequired(), Length(min=2, max=20)])
-    email = StringField('Email',
-                        validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    confirm_password = PasswordField('Confirm Password',
-                                     validators=[DataRequired(), EqualTo('password')])
-    submit = SubmitField('Sign Up')
+class DollarField(DecimalField):
+    def process_formdata(self, valuelist):
+        if len(valuelist) == 1:
+            self.data = [valuelist[0].strip('$').replace(',', '')]
+        else:
+            self.data = []
 
+        # Calls "process_formdata" on the parent types of "DollarField",
+        # which includes "DecimalField"
+       # super(DollarField).process_formdata(self.data)
 
-class LoginForm(FlaskForm):
-    email = StringField('Email',
-                        validators=[DataRequired(), Email()])
-    password = PasswordField('Password', validators=[DataRequired()])
-    remember = BooleanField('Remember Me')
-    submit = SubmitField('Login')
+class ItemForm(FlaskForm):
+    name = StringField('Title', validators=[DataRequired()])
+    description = TextAreaField('Content', validators=[DataRequired()])
+    categorie = SelectField('Categorie', choices=[(c.id, c.name) for c in MyCategories],coerce=int, validators=[DataRequired()])
+    price = DollarField('Price', validators=[DataRequired()])
+    # picture
+    submit = SubmitField('Create new Item')
+

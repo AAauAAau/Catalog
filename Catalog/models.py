@@ -1,10 +1,16 @@
-from Catalog import db
+from Catalog import db, login_manager
 import datetime
 from passlib.apps import custom_app_context as pwd_context
 from itsdangerous import(TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired)
+from flask_login import UserMixin
 import random, string
 
 secret_key = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(32))
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
 class Categorie(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
@@ -30,13 +36,14 @@ class CategorieItem(db.Model):
     def __repr__(self):
         return f"CategorieItem('{self.name}', '{self.description}', '{self.id}', '{self.price}','{self.course}','{self.created_at}')"
 
-class User(db.Model):
+class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(100), unique=True, nullable=True)
     name = db.Column(db.String(100), nullable=True)
     password_hash = db.Column(db.String(64))
     picture = db.Column(db.String(200))
     active = db.Column(db.Boolean, default=False)
+    items = db.relationship('CategorieItem', backref='author', lazy=True)
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow())
 
     def hash_password(self, password):
