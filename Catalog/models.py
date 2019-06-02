@@ -33,6 +33,16 @@ class CategorieItem(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.datetime.utcnow())
 
+    @property
+    def serialize(self):
+       """Return object data in easily serializeable format"""
+       return {
+       	    'id': self.id,
+           'name': self.name,
+           'description' : self.description,
+           'price':self.price
+       }
+
     def __repr__(self):
         return f"CategorieItem('{self.name}', '{self.description}', '{self.id}', '{self.price}','{self.course}','{self.created_at}')"
 

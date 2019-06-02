@@ -56,8 +56,8 @@
                         <a class="nav-item nav-link" href="{{ url_for('newItem') }}">Create new Item</a>
                         <a class="nav-item nav-link" href="{{ url_for('myItems') }}">My Items</a>
                         <a class="nav-item nav-link" href="{{ url_for('logout') }}">Logout</a> {% if current_user.picture is not none %}
-                        <img class="profile-img rounded-circle d-inline-block mr-1" src="{{current_user.picture}}"> {% else %}
-                        <img class="rounded-circle profile-img d-inline-block mr-1" src="{{ url_for('static/profile_pics/default.png') }}"> {%endif %} {% else %}
+                        <img class="profile-img rounded-circle d-inline-block mr-1 align-top" src="{{current_user.picture}}"> {% else %}
+                        <img class="rounded-circle profile-img d-inline-block mr-1 align-top" src="{{ url_for('static/profile_pics/default.png') }}"> {%endif %} {% else %}
                         <!-- <div class="g-signin2" data-onsuccess="onSignIn" data-theme="dark"></div> -->
                         <a class="nav-item nav-link" href="{{ url_for('login') }}">Login</a> {% endif %}
                     </div>

@@ -41,10 +41,30 @@ def delete_item(item_id):
     flash('Your iIem has been deleted!', 'success')
     return redirect(url_for('home'))
 
-@app.route('/api/resource')
-@login_required
-def get_resource():
-    return jsonify({ 'data': 'Hello, %s!' % g.user.name })
+@app.route('/api/getItem/<int:id>')
+# @login_required
+def get_Item(id):
+    item = CategorieItem.query.get_or_404(id)
+    if item is not None:
+        return jsonify(CategorieItem=item.serialize) 
+    else:
+        return jsonify({ "error": "CategorieItem Id:"+id+" not found" })
+
+@app.route('/api/getAllItems/')
+# @login_required
+def get_AllItem():
+    items = CategorieItem.query.order_by(CategorieItem.name).all()
+    return jsonify(CategorieItem=[i.serialize for i in items])
+
+@app.route('/api/getItemsViaCategorie/<name>')
+# @login_required
+def get_Item_via_Categories(name):
+    categorie = Categorie.query.filter_by(name=name).first()
+    if categorie is not None:
+        items = CategorieItem.query.filter_by(categorie_id = categorie.id).order_by(CategorieItem.name)
+        return jsonify(CategorieItem=[i.serialize for i in items])
+    else:
+        return jsonify({ "error": "Categorie: "+name+" not found" })
 
 @app.route("/logout")
 def logout():
@@ -90,6 +110,7 @@ def update_item(item_id):
     elif request.method == 'GET':
         form.name.data = item.name
         form.description.data = item.description
+        form.price.data = float(item.price)
     return render_template('new_item.html', title='Update Item',
                            form=form, legend='Update Item')
 @app.route('/api/users/<int:id>')
