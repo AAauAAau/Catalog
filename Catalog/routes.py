@@ -24,10 +24,11 @@ def myItems():
     categorieitems = CategorieItem.query.filter_by(user_id=current_user.id).order_by(CategorieItem.created_at.desc()).all()
     return render_template('home.html', title='My Items', categories=categories, categorieitems=categorieitems)
 
-@app.route("/showCategorie/<int:categorie_id>/")
+@app.route("/showCategorie/<categorie>/")
 @login_required
-def showCategorie(categorie_id):
-    categorieitems = CategorieItem.query.filter_by(categorie_id=categorie_id).order_by(CategorieItem.created_at.desc()).all()
+def showCategorie(categorie):
+    categorie=Categorie.query.filter_by(name=categorie).first()
+    categorieitems = CategorieItem.query.filter_by(categorie_id=categorie.id).order_by(CategorieItem.created_at.desc()).all()
     return render_template('home.html', title='My Items', categories=categories, categorieitems=categorieitems)
 
 @app.route("/item/<int:item_id>/delete", methods=['POST'])
@@ -48,7 +49,7 @@ def get_Item(id):
     if item is not None:
         return jsonify(CategorieItem=item.serialize) 
     else:
-        return jsonify({ "error": "CategorieItem Id:"+id+" not found" })
+        return jsonify({"error": "CategorieItem Id:"+id+" not found" })
 
 @app.route('/api/getAllItems/')
 # @login_required
