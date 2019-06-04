@@ -102,3 +102,11 @@ a.article-title:hover {
     width: 25px;
     margin-right: 6px;
 }
+
+.g-signin2 {
+    width: 100%;
+}
+
+.g-signin2>div {
+    margin: 0 auto;
+}

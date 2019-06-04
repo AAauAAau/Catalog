@@ -1,9 +1,13 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, SelectField, DecimalField
+from wtforms import StringField, FileField, PasswordField, SubmitField, BooleanField, TextAreaField, SelectField, DecimalField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, Required
 from Catalog.models import Categorie
+from flask_wtf.file import FileField, FileRequired, FileAllowed
+from Catalog import app, photos
+
 
 MyCategories = Categorie.query.order_by(Categorie.name).all()
+
 
 class DollarField(DecimalField):
     def process_formdata(self, valuelist):
@@ -21,6 +25,6 @@ class ItemForm(FlaskForm):
     description = TextAreaField('Content', validators=[DataRequired()])
     categorie = SelectField('Categorie', choices=[(c.id, c.name) for c in MyCategories],coerce=int, validators=[DataRequired()])
     price = DollarField('Price', validators=[DataRequired()])
-    # picture
-    submit = SubmitField('Create new Item')
+    photo = FileField('Photo', validators=[FileRequired(),FileAllowed(photos, 'Images only!')])
+    submit = SubmitField('Save Item')
 

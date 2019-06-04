@@ -9,7 +9,7 @@
                         <h5 class="card-title text-center">Sign In</h5>
                         <form class="form-signin login-message-center">
                             <hr class="my-4">
-                            <div id="my-signin2"><i class="fab fa-google mr-2"></i> Sign in with Google</div>
+                            <div id="my-signin2" class="g-signin2"> Sign in with Google</div>
                             <div id="result"></div>
                         </form>
                     </div>
@@ -34,7 +34,7 @@
                     $('#result').html('Login Successful!</br>' + xhr.responseText + '</br>Redirecting...')
                     setTimeout(function() {
                         window.location.href = "/home";
-                    }, 4000);
+                    }, 400000);
                 };
             }
             xhr.send('idtoken=' + id_token);

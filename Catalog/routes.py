@@ -1,5 +1,5 @@
 from flask import render_template, url_for, flash, redirect, request, jsonify, abort, g, make_response
-from Catalog import app, db
+from Catalog import app, db, photos
 from Catalog.models import User, CategorieItem, Categorie
 from Catalog.forms import ItemForm
 from google.oauth2 import id_token
@@ -8,6 +8,7 @@ from flask_login import login_user, current_user, logout_user, login_required
 import httplib2
 import requests
 import json
+import os
 
 CLIENT_ID = json.loads(open('Catalog/client_secrets.json', 'r').read())['web']['client_id']
 categories = Categorie.query.order_by(Categorie.name).all()
@@ -37,6 +38,8 @@ def delete_item(item_id):
     item = CategorieItem.query.get_or_404(item_id)
     if item.author != current_user:
         abort(403)
+    if item.picture is not None:
+        os.remove(os.path.join(app.config['UPLOADED_PHOTOS_DEST'], item.picture))
     db.session.delete(item)
     db.session.commit()
     flash('Your iIem has been deleted!', 'success')
@@ -80,8 +83,13 @@ def login():
 @login_required
 def newItem():
     form = ItemForm()
+    file_url=None
     if form.validate_on_submit():
-        item = CategorieItem(name=form.name.data, description=form.description.data, author=current_user, price=str(form.price.data[0]), categorie=Categorie.query.get_or_404(form.categorie.data))
+        if form.photo.data is not None:
+            filename = photos.save( form.photo.data)
+            file_url = photos.url(filename)
+            #app.config['UPLOADED_PHOTOS_DEST']
+        item = CategorieItem(name=form.name.data, description=form.description.data, author=current_user, price=str(form.price.data[0]), categorie=Categorie.query.get_or_404(form.categorie.data),picture=file_url)
         db.session.add(item)
         db.session.commit()
         flash('Your Item has been created!', 'success')
@@ -102,9 +110,16 @@ def update_item(item_id):
     if item.author != current_user:
         abort(403)
     form = ItemForm()
+    file_url=None
     if form.validate_on_submit():
         item.name = form.name.data
         item.description = form.description.data
+        item.price=form.price.data
+        if form.photo.data is not None:
+            filename = photos.save(form.photo.data)
+            file_url = photos.url(filename)
+            item.picture=file_url
+        db.session.update(item)
         db.session.commit()
         flash('Your Item has been updated!', 'success')
         return redirect(url_for('item', item_id=item.id))
@@ -112,8 +127,10 @@ def update_item(item_id):
         form.name.data = item.name
         form.description.data = item.description
         form.price.data = float(item.price)
+        form.photo.data=item.picture
+        file_url=item.picture
     return render_template('new_item.html', title='Update Item',
-                           form=form, legend='Update Item')
+                           form=form, legend='Update Item',file_url=file_url)
 @app.route('/api/users/<int:id>')
 @login_required
 def get_user(id):
