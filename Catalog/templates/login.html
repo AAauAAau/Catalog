@@ -34,7 +34,7 @@
                     $('#result').html('Login Successful!</br>' + xhr.responseText + '</br>Redirecting...')
                     setTimeout(function() {
                         window.location.href = "/home";
-                    }, 400000);
+                    }, 4000);
                 };
             }
             xhr.send('idtoken=' + id_token);

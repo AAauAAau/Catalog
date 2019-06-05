@@ -6,8 +6,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- google signin -->
+    {% if googleClientID %}
     <meta name="google-signin-scope" content="profile email">
-    <meta name="google-signin-client_id" content="239886233493-g1fe7kg2pv44hlgv04fldhm0665trksr.apps.googleusercontent.com">
+    <meta name="google-signin-client_id" content="{{googleClientID}}"> {% endif %}
     <!-- <script src="https://apis.google.com/js/platform.js" async defer></script> -->
     <!-- <script src="https://apis.google.com/js/client:platform.js?onload=renderButton" async defer></script> -->
     <!-- fonttype -->

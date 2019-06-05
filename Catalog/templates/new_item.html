@@ -43,7 +43,10 @@
                     <span>{{ error }}</span> {% endfor %}
                 </div>
                 {% else %} {{ form.photo(class="form-control form-control-lg") }} {% endif %} {% if file_url %}
-                <img class="form-control form-control-lg rounded article-img" src="{{ file_url }}"> {% endif %}
+                <div>
+                    <img class="img-fluid rounded article-img" src="{{ file_url }}">
+                </div>
+                {% endif %}
             </div>
         </fieldset>
         <div class="form-group">
