@@ -44,13 +44,13 @@
                 </div>
                 {% else %} {{ form.photo(class="form-control form-control-lg") }} {% endif %} {% if file_url %}
                 <div>
-                    <img class="img-fluid rounded article-img" src="{{ file_url }}">
+                    <img class="img-fluid rounded update-img" src="{{ file_url }}">
                 </div>
                 {% endif %}
             </div>
         </fieldset>
         <div class="form-group">
-            {{ form.submit(class="btn btn-outline-info") }}
+            {{ form.submit(class="btn btn-outline-info btn-block") }}
         </div>
     </form>
 </div>

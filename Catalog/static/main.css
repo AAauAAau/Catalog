@@ -55,6 +55,12 @@ a.article-title:hover {
 }
 
 .article-img {
+    height: 65px;
+    width: 65px;
+    margin-right: 16px;
+}
+
+.update-img {
     margin: 10px 0px 0px
 }
 

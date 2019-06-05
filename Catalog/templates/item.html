@@ -1,9 +1,5 @@
 {% extends "layout.html" %} {% block content %}
 <article class="media content-section">
-    {% if item.picture is not none %}
-    <img class="rounded-circle article-img" src="{{item.picture}}"> {% else %}
-    <img class="rounded-circle article-img" src="https://cdn.pixabay.com/photo/2014/10/14/20/24/the-ball-488700_960_720.jpg"> {%endif %}
-
     <div class="media-body">
         <div class="article-metadata">
             <a class="mr-2">{{ item.author.name }}</a>
@@ -13,7 +9,9 @@
         <p class="article-content">{{ item.description }}</p>
         {% if item.price is not none %}
         <p class="article-price">${{ item.price }}</p>
-        {% endif %} {% if item.author == current_user %}
+        {% endif %} {% if item.picture is not none %}
+        <img class="img-fluid rounded update-img" src="{{item.picture}}"> {% else %}
+        <img class="img-fluid rounded update-img" src="https://cdn.pixabay.com/photo/2014/10/14/20/24/the-ball-488700_960_720.jpg"> {%endif %} {% if item.author == current_user %}
         <div>
             <a class=" btn btn-secondary btn-sm mt-1 mb-1 " href="{{ url_for( 'update_item', item_id=item.id) }} ">Update</a>
             <button type="button " class="btn btn-danger btn-sm m-1 " data-toggle="modal " data-target="#deleteModal ">Delete</button>
