@@ -1,8 +1,11 @@
+import os
+from Catalog import routes
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
-from flask_uploads import patch_request_class, UploadSet, configure_uploads, IMAGES
-import os
+from flask_uploads import patch_request_class, UploadSet,
+configure_uploads, IMAGES
+
 
 app = Flask(__name__)
 
@@ -19,5 +22,4 @@ photos = UploadSet('photos', IMAGES)
 configure_uploads(app, photos)
 patch_request_class(app)  # set maximum file size, default is 16MB
 
-#has to by the last import
-from Catalog import routes
+# has to by the last import

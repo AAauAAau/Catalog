@@ -1,22 +1,30 @@
-from Catalog import db, login_manager
-import datetime
-from passlib.apps import custom_app_context as pwd_context
-from itsdangerous import(TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired)
 from flask_login import UserMixin
-import random, string
+import random
+import string
+import datetime
+from Catalog import db, login_manager
+from passlib.apps import custom_app_context as pwd_context
+from itsdangerous import
+(TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired)
 
-secret_key = ''.join(random.choice(string.ascii_uppercase + string.digits) for x in range(32))
+
+secret_key = ''.join(random.choice(
+    string.ascii_uppercase + string.digits) for x in range(32))
+
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+
 class Categorie(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20), unique=False, nullable=False)
-    categoriesItem = db.relationship('CategorieItem', backref='categorie', lazy=True)
+    categoriesItem = db.relationship(
+        'CategorieItem', backref='categorie', lazy=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+
     def __repr__(self):
         return f"Categorie('{self.name}','{self.id}')"
 
@@ -35,16 +43,19 @@ class CategorieItem(db.Model):
 
     @property
     def serialize(self):
-       """Return object data in easily serializeable format"""
-       return {
-       	    'id': self.id,
-           'name': self.name,
-           'description' : self.description,
-           'price':self.price
-       }
+        """Return object data in easily serializeable format"""
+        return {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description,
+            'price': self.price
+        }
 
     def __repr__(self):
-        return f"CategorieItem('{self.name}', '{self.description}', '{self.id}', '{self.price}','{self.course}','{self.created_at}')"
+        return f"CategorieItem('{self.name}', '{self.description}',
+                               '{self.id}', '{self.price}', '{self.course}',
+                               '{self.created_at}')"
+
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -63,23 +74,22 @@ class User(db.Model, UserMixin):
         return pwd_context.verify(password, self.password_hash)
 
     def generate_auth_token(self, expiration=600):
-        s = Serializer(secret_key, expires_in = expiration)
-        return s.dumps({'id': self.id })
-            
+        s = Serializer(secret_key, expires_in=expiration)
+        return s.dumps({'id': self.id})
+
     @staticmethod
     def verify_auth_token(token):
-    	s = Serializer(secret_key)
-    	try:
-    		data = s.loads(token)
-    	except SignatureExpired:
-    		#Valid Token, but expired
-    		return None
-    	except BadSignature:
-    		#Invalid Token
-    		return None
-    	user_id = data['id']
-    	return user_id
+        s = Serializer(secret_key)
+        try:
+            data = s.loads(token)
+        except SignatureExpired:
+            # Valid Token, but expired
+            return None
+        except BadSignature:
+            # Invalid Token
+            return None
+        user_id = data['id']
+        return user_id
 
     def __repr__(self):
         return f"User('{self.name}', '{self.email}', '{self.id}')"
-        
