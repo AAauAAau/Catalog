@@ -110,4 +110,5 @@ venv.bak/
 notes.txt
 /Catalog/database
 /Catalog/static/profile_pics
-/_uploads
+/Catalog/_uploads/
+

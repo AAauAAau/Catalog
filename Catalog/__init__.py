@@ -5,13 +5,11 @@ from flask_uploads import patch_request_class, UploadSet, configure_uploads, IMA
 import os
 
 app = Flask(__name__)
-#app.config.from_object('config')
 
 app.config['SECRET_KEY'] = '5791628bb0b13ce0c676dfde280ba245'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database/datasource.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-app.config['UPLOADED_PHOTOS_DEST'] = os.getcwd() + '\\_uploads\\photos'
-#http://localhost:5000/_uploads/photos/FullSizeRender_2.jpg
+app.config['UPLOADED_PHOTOS_DEST'] = os.getcwd() + '\\Catalog\\_uploads'
 db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = 'login'

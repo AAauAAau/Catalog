@@ -2,7 +2,7 @@
 <article class="media content-section">
 
     {% if categorieitem.picture is not none %}
-    <img class="rounded-circle article-img" src="{{categorieitem.picture}}"> {% else %}
+    <img class="rounded-circle article-img" src="{{ url_for('send_file',filename=categorieitem.picture)}}"> {% else %}
     <img class="rounded-circle article-img" src="https://cdn.pixabay.com/photo/2014/10/14/20/24/the-ball-488700_960_720.jpg"> {%endif %}
     <div class="media-body">
         <div class="article-metadata">
