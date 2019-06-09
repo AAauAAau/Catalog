@@ -52,9 +52,7 @@ class CategorieItem(db.Model):
         }
 
     def __repr__(self):
-        return f"CategorieItem('{self.name}', '{self.description}',
-                               '{self.id}', '{self.price}', '{self.course}',
-                               '{self.created_at}')"
+        return f"CategorieItem('{self.name}', '{self.description}','{self.id})"
 
 
 class User(db.Model, UserMixin):

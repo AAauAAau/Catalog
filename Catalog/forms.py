@@ -3,8 +3,8 @@ from Catalog.models import Categorie
 from wtforms.validators import DataRequired, Length, Email, EqualTo, Required
 from Catalog import app, photos
 from flask_wtf import FlaskForm
-from wtforms import StringField, FileField, PasswordField, SubmitField,
-BooleanField, TextAreaField, SelectField, DecimalField
+from wtforms import StringField, FileField, PasswordField, SubmitField
+from wtforms import BooleanField, TextAreaField, SelectField, DecimalField
 
 MyCategories = Categorie.query.order_by(Categorie.name).all()
 

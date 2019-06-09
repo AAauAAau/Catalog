@@ -8,8 +8,8 @@ from google.oauth2 import id_token
 from Catalog.forms import ItemForm
 from Catalog.models import User, CategorieItem, Categorie
 from Catalog import app, db, photos
-from flask import render_template, url_for, flash, redirect, request,
-jsonify, abort, g, make_response, send_from_directory
+from flask import render_template, url_for, flash, redirect, request
+from flask import abort, g, make_response, send_from_directory
 
 
 CLIENT_ID = json.loads(
@@ -45,8 +45,7 @@ def myItems():
 def showCategorie(categorie):
     categorie = Categorie.query.filter_by(name=categorie).first()
     categorieitems = CategorieItem.query.filter_by(
-        categorie_id=categorie.id).
-    order_by(CategorieItem.created_at.desc()).all()
+        categorie_id=categorie.id).order_by(CategorieItem.created_at.desc()).all()
     return render_template('home.html',
                            title='My Items',
                            categories=categories,
