@@ -4,8 +4,8 @@ import string
 import datetime
 from Catalog import db, login_manager
 from passlib.apps import custom_app_context as pwd_context
-from itsdangerous import
-(TimedJSONWebSignatureSerializer as Serializer, BadSignature, SignatureExpired)
+from itsdangerous import (TimedJSONWebSignatureSerializer as
+                          Serializer, BadSignature, SignatureExpired)
 
 
 secret_key = ''.join(random.choice(

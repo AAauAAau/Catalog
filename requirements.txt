@@ -6,8 +6,8 @@ passlib[bcrypt]
 flask-httpauth
 itsdangerous
 requests
-oauth2client.client
+google.auth.transport
+google.oauth2
 flask_uploads
-google-api-python-client
 httplib2
 flask-login
