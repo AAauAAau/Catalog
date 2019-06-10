@@ -11,3 +11,4 @@ google.oauth2
 flask_uploads
 httplib2
 flask-login
+flask-seasurf

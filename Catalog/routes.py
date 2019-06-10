@@ -10,11 +10,12 @@ from Catalog.models import User, CategorieItem, Categorie
 from Catalog import app, db, photos
 from flask import render_template, url_for, flash, redirect, request
 from flask import abort, g, make_response, send_from_directory
-
+from flask_seasurf import SeaSurf
 
 CLIENT_ID = json.loads(
     open('Catalog/client_secrets.json', 'r').read())['web']['client_id']
 categories = Categorie.query.order_by(Categorie.name).all()
+csrf = SeaSurf(app)
 
 
 @app.route("/")
