@@ -10,12 +10,13 @@ from Catalog.models import User, CategorieItem, Categorie
 from Catalog import app, db, photos
 from flask import render_template, url_for, flash, redirect, request
 from flask import abort, g, make_response, send_from_directory
-from flask_seasurf import SeaSurf
+from flask_wtf.csrf import CSRFProtect
 
+
+csrf = CSRFProtect(app)
 CLIENT_ID = json.loads(
     open('Catalog/client_secrets.json', 'r').read())['web']['client_id']
 categories = Categorie.query.order_by(Categorie.name).all()
-csrf = SeaSurf(app)
 
 
 @app.route("/")
@@ -103,12 +104,14 @@ def get_Item_via_Categories(name):
 
 
 @app.route("/logout")
+@csrf.exempt
 def logout():
     logout_user()
     return redirect(url_for('home'))
 
 
 @app.route("/login")
+@csrf.exempt
 def login():
     return render_template('login.html', googleClientID=CLIENT_ID)
 

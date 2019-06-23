@@ -14,10 +14,14 @@ Catalog uses follwing open source projects:
 ### Installation and run
 Create and Add your own *client_secrets.json* to the Catalog/Catalog Folder. How to create this file can be found on the following website [developers.google](https://developers.google.com/identity/protocols/OAuth2WebServer)
 
+Create the Database and add an environment variable with the path to the database
+```sh
+$ export DATABASE_URL="postgresql://postgres:postgres@localhost:5432/cata"
+```
 Install the dependencies from the *requirements.txt* file
 ```sh
 $ pip install -r requirements.txt
-```
+c
 Run the following python scripts to create and fill the sql database
 ```sh
 $ python CreateDbAndContent.py
