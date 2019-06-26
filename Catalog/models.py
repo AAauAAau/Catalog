@@ -8,8 +8,8 @@ from itsdangerous import (TimedJSONWebSignatureSerializer as
                           Serializer, BadSignature, SignatureExpired)
 
 
-secret_key = ''.join(random.choice(
-    string.ascii_uppercase + string.digits) for x in range(32))
+# secret_key = ''.join(random.choice(
+    # string.ascii_uppercase + string.digits) for x in range(32))
 
 
 @login_manager.user_loader
