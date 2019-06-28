@@ -2,7 +2,6 @@ import httplib2
 import requests
 import json
 import os
-from pathlib import Path
 from flask_login import login_user, current_user, logout_user, login_required
 from google.auth.transport import requests as googleRequests
 from google.oauth2 import id_token
@@ -16,7 +15,7 @@ from flask_wtf.csrf import CSRFProtect
 categories = Categorie.query.order_by(Categorie.name).all()
 csrf = CSRFProtect(app)
 CLIENT_ID = json.loads(
-    open(Path(os.getcwd() +'/Catalog/client_secrets.json'), 'r').read())['web']['client_id']
+    open(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'client_secrets.json'), 'r').read())['web']['client_id']
 
 
 @app.route("/")
